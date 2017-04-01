@@ -1,5 +1,5 @@
 #!/usr/bin/python
-from comms import core
+from comms.core import Core
 
 def stop():
     core.stop()
@@ -10,9 +10,10 @@ def get_token():
     return token
 
 if __name__ == "__main__":
-    token = get_token()
-    if token:
-        core.setup(token)
+    tokenstr = get_token()
+    if tokenstr:
+        core = Core()
+        core.setup(tokenstr)
         core.run()
     else:
         exit(1)
