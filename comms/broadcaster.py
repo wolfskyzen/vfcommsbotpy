@@ -39,11 +39,14 @@ class _BroadcastCommand:
     broadcaster = None
 
     def __init__(self, broadcaster):
-        print("Init _BroadcastCommand")
         self.broadcaster = broadcaster
 
     def handle_broadcast(self, bot, update):
         if update.message.chat.type != Chat.PRIVATE:            
+            return
+        if not self.broadcaster.can_broadcast():
+            message = "There are no rooms setup to broadcast in. Please enable broadcasting in a group before using this command."
+            bot.sendMessage(update.message.chat_id, message)
             return
         user_id = update.message.from_user.id
         if user_id in self.users:
@@ -107,6 +110,14 @@ class Broadcaster:
                     bot.sendMessage(v.id, final_message)
         except:
             print(sys.exc_info())
+            
+    def can_broadcast(self):
+        if not self.groups:
+            return False
+        for k, v in self.groups.items():
+            if v.allowed:
+                return True
+        return False
 
     def handle_addgroup(self, bot, update):
         if update.message.chat.type == Chat.PRIVATE:
