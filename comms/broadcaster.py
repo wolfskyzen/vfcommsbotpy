@@ -128,6 +128,19 @@ class Broadcaster:
             self.save()
         else:
             print("Group '{0}' already added".format(update.message.chat.title))
+            
+    def handle_listgroups(self, bot, update):
+        if update.message.chat.type != Chat.PRIVATE:
+            return
+        message = None
+        if not self.groups:
+            message = "There are no groups setup to broadcast in. Use /addgroup, in that group, to add it to the broadcast list."
+        else:
+            message = "Group Title (Broadcasting)\n"
+            for k, v in self.groups.items():
+                message += "\n{0} ({1})".format(v.title, str(v.allowed))
+        if not message == None:
+            bot.sendMessage(update.message.from_user.id, message)    
 
     def load(self):
         if os.path.isfile(self.FILE_NAME) == False:
@@ -152,6 +165,8 @@ class Broadcaster:
         self.load()
         handler = CommandHandler('addgroup', self.handle_addgroup, Filters.command)
         dispatcher.add_handler(handler);
+        handler = CommandHandler('listgroups', self.handle_listgroups, Filters.command)
+        dispatcher.add_handler(handler);        
         self.cmd_broadcast.setup(dispatcher)
 
 def setup_handler(dispatcher):
