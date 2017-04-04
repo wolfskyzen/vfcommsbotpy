@@ -45,7 +45,7 @@ class _BroadcastCommand:
         if update.message.chat.type != Chat.PRIVATE:            
             return
         if not self.broadcaster.can_broadcast():
-            message = "There are no rooms setup to broadcast in. Please enable broadcasting in a group before using this command."
+            message = "There are no groups setup to broadcast in. Please enable broadcasting in a group before using this command."
             bot.sendMessage(update.message.chat_id, message)
             return
         user_id = update.message.from_user.id
@@ -122,12 +122,12 @@ class Broadcaster:
     def handle_addgroup(self, bot, update):
         if update.message.chat.type == Chat.PRIVATE:
             return
-        group_id = chat.id
+        group_id = update.message.chat.id
         if not self.groups or group_id not in self.groups:
             self.groups[group_id] = Group.from_chat(chat, True)
             self.save()
         else:
-            print("Group '{0}' already added".format(chat.title))
+            print("Group '{0}' already added".format(update.message.chat.title))
 
     def load(self):
         if os.path.isfile(self.FILE_NAME) == False:
