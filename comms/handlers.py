@@ -9,5 +9,7 @@ def setup(dispatcher):
     about.setup_handler(dispatcher)
     from comms import broadcaster
     broadcaster.setup_handler(dispatcher)
+    from comms import users
+    users.setup_handler(dispatcher)
     from comms import whois
     whois.setup_handler(dispatcher)
