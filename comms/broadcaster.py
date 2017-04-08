@@ -4,7 +4,6 @@ import os
 import sys
 from telegram import Chat
 from telegram.ext import CommandHandler
-from telegram.ext import ConversationHandler
 from telegram.ext import Filters
 from telegram.ext import MessageHandler
 
