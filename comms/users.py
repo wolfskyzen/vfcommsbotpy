@@ -202,7 +202,14 @@ class UserManager:
         handler = CommandHandler('userlist', self.handle_userlist, Filters.command)
         dispatcher.add_handler(handler)
 
+global instance
+
+def is_admin(id):
+    global instance
+    return instance.is_admin(id)
+
 def setup_handler(dispatcher):
     print("Setup user commands");
+    global instance
     instance = UserManager()
     instance.setup(dispatcher)
