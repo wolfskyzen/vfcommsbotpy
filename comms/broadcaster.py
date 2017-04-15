@@ -4,6 +4,7 @@ import os
 import sys
 from telegram import Chat
 from telegram.ext import CommandHandler
+from telegram.ext import ConversationHandler
 from telegram.ext import Filters
 from telegram.ext import MessageHandler
 
@@ -36,53 +37,63 @@ class Group:
 class _BroadcastCommand:
     users = list()
     broadcaster = None
+    
+    WAITING = range(1)
 
     def __init__(self, broadcaster):
         self.broadcaster = broadcaster
 
     def handle_broadcast(self, bot, update):
         if update.message.chat.type != Chat.PRIVATE:            
-            return
+            return ConversationHandler.END
         if not self.broadcaster.can_broadcast():
             message = "There are no groups setup to broadcast in. Please enable broadcasting in a group before using this command."
             bot.sendMessage(update.message.chat_id, message)
-            return
+            return ConversationHandler.END
         user_id = update.message.from_user.id
         if user_id in self.users:
-            return
+            return ConversationHandler.END
         self.users.append(user_id)
         message = "Please tell me the message you wish to broadcast to ALL VF Staff chatrooms. Or message me with /cancel to stop the broadcast."
         bot.sendMessage(update.message.chat_id, message)
+        return _BroadcastCommand.WAITING
 
     def handle_cancel(self, bot, update):
         if update.message.chat.type != Chat.PRIVATE:
-            return
+            return ConversationHandler.END
         user_id = update.message.from_user.id
         if user_id in self.users:
             self.users.remove(user_id)
             message = "Your message broadcast has been cancelled."
             bot.sendMessage(update.message.chat_id, message)
+        return ConversationHandler.END
 
     def handle_message(self, bot, update):
         if update.message.chat.type != Chat.PRIVATE:
-            return
+            return ConversationHandler.END
         user_id = update.message.from_user.id
         if user_id in self.users:
             self.users.remove(user_id)
             self.broadcaster.broadcast(bot, update.message.from_user, update.message.text)
             message = "Your message has been broadcast to ALL VF Staff chatrooms."
             bot.sendMessage(update.message.chat_id, message)
+        return ConversationHandler.END
 
     def setup(self, dispatcher):
-        handler = CommandHandler('broadcast', self.handle_broadcast, Filters.command)
-        dispatcher.add_handler(handler);
-        handler = CommandHandler('cancel', self.handle_cancel, Filters.command)
-        dispatcher.add_handler(handler);
-        handler = MessageHandler(Filters.text, self.handle_message)
-        dispatcher.add_handler(handler);
+        handler = ConversationHandler(
+            entry_points=[CommandHandler('broadcast', self.handle_broadcast, Filters.command)],
+            
+            states={
+                _BroadcastCommand.WAITING: [MessageHandler(Filters.text, self.handle_message)],
+            },
+            
+            fallbacks=[CommandHandler('cancel', self.handle_cancel, Filters.command)]
+        )
+        dispatcher.add_handler(handler)
 
 """
 TODO: Build these two classes to use the inline commands to enable/disable groups from the broadcast list
+TODO: Abstract this into a GroupManager that the broadcast command can communicate with
 
 class _DisableBroadcastCommand:
 
