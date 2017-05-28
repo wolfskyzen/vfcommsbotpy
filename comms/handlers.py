@@ -11,6 +11,8 @@ def setup(dispatcher):
     broadcaster.setup_handler(dispatcher)
     from comms import help
     help.setup_handler(dispatcher)
+    from comms import meeting
+    meeting.setup_handler(dispatcher)
     from comms import users
     users.setup_handler(dispatcher)
     from comms import whois

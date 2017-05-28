@@ -114,7 +114,9 @@ class Broadcaster:
         if not self.groups:
             return
         try:
-            final_message = "Message from @{0}:\n\n".format(user.username) + message
+            final_message = message;
+            if user is not None:
+                final_message = "Message from @{0}:\n\n".format(user.username) + message
             for k, v in self.groups.items():
                 if v.allowed:
                     bot.sendMessage(v.id, final_message)
@@ -179,7 +181,15 @@ class Broadcaster:
         dispatcher.add_handler(handler);        
         self.cmd_broadcast.setup(dispatcher)
 
+global instance
+
+def broadcast(bot, message):
+    global instance
+    if instance is not None:
+        instance.broadcast(bot, None, message)
+
 def setup_handler(dispatcher):
     print("Setup broadcast commands");
+    global instance
     instance = Broadcaster()
     instance.setup(dispatcher)
