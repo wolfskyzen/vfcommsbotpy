@@ -141,7 +141,7 @@ class Broadcaster:
         else:
             print("Group '{0}' already added".format(update.message.chat.title))
             
-    def handle_listgroups(self, bot, update):
+    def handle_grouplist(self, bot, update):
         if update.message.chat.type != Chat.PRIVATE:
             return
         message = None
@@ -177,7 +177,7 @@ class Broadcaster:
         self.load()
         handler = CommandHandler('addgroup', self.handle_addgroup, Filters.command)
         dispatcher.add_handler(handler);
-        handler = CommandHandler('listgroups', self.handle_listgroups, Filters.command)
+        handler = CommandHandler('grouplist', self.handle_grouplist, Filters.command)
         dispatcher.add_handler(handler);        
         self.cmd_broadcast.setup(dispatcher)
 

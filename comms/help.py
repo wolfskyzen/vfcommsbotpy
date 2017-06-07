@@ -21,7 +21,7 @@ Admin commands. If you get this message, you can use these commands. Must be sen
 /adminremove - Adds a user to the admin list. Must include an @ mention of the user to add.
 /clearmeeting - Clears the current meeting date and time.
 /clearmeetinglink - Clears the current remote meeting link.
-/listgroups - List all the known groups setup with /addgroup.
+/grouplist - List all the known groups setup with /addgroup.
 /setmeetinglink - Set a valid weblink for remote meeting connection. Will broadcast to all groups when changed.
 /setnextmeeting - Set the date, time and location of the next meeting. Will broadcast to all groups when changed.
 /userlist - Lists the usernames of all noticed users, and which ones are admins.

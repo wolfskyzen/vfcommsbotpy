@@ -12,8 +12,11 @@ def get_token():
 if __name__ == "__main__":
     tokenstr = get_token()
     if tokenstr:
-        core = Core()
-        core.setup(tokenstr)
-        core.run()
+        try:
+            core = Core()
+            core.setup(tokenstr)
+            core.run()
+        except:
+            print(sys.exc_info())
     else:
         exit(1)
