@@ -7,6 +7,7 @@ from comms import broadcaster
 from comms import users
 from dateutil import parser
 from telegram import Chat
+from telegram import MessageEntity
 from telegram.ext import CommandHandler
 from telegram.ext import ConversationHandler
 from telegram.ext import Filters
@@ -110,11 +111,48 @@ class MeetingManager:
         message = "Next meeting information has been cleared."
         bot.sendMessage(update.message.chat.id, message)
         
+    def handle_clearmeetinglink(self, bot, update):
+        if update.message.chat.type != Chat.PRIVATE:
+            return
+        if not users.is_admin(update.message.from_user.id):
+            return
+        self.link = ""
+        self.save()
+        message = "Meeting link has been cleared."
+        bot.sendMessage(update.message.chat.id, message)
+        
+    def handle_meetinglink(self, bot, update):
+        message = ""
+        if self.link is None or self.link == "":
+            message = "Meeting link is not setup yet"
+        else:
+            message = "Connect to the meeting here: " + self.link
+        bot.sendMessage(update.message.chat.id, message)
+        
     def handle_nextmeeting(self, bot, update):
         message = self.get_next_meeting()
         if message is None:
             return
-        bot.sendMessage(update.message.chat.id, message)        
+        bot.sendMessage(update.message.chat.id, message)
+
+    def handle_setmeetinglink(self, bot, update):
+        if update.message.chat.type != Chat.PRIVATE:
+            return
+        if not users.is_admin(update.message.from_user.id):
+            return
+        urls = update.message.parse_entities(MessageEntity.URL)
+        if not urls:
+            message = "Unable to find a valid weblink to share as the meeting link."
+            bot.sendMessage(update.message.chat.id, message)
+        else:
+            for k, v in urls.items():
+                self.link = v
+                self.save()
+                break
+            message = "Meeting link has been set @{0}".format(update.message.from_user.username)
+            message += "\n"
+            message += self.link
+            broadcaster.broadcast(bot, message)
         
     def get_next_meeting(self):
         if self.date is None or self.location is None:
@@ -147,8 +185,14 @@ class MeetingManager:
         self.load()
         handler = CommandHandler('clearmeeting', self.handle_clearmeeting, Filters.command)
         dispatcher.add_handler(handler)
+        handler = CommandHandler('clearmeetinglink', self.handle_clearmeetinglink, Filters.command)
+        dispatcher.add_handler(handler)
+        handler = CommandHandler('meetinglink', self.handle_meetinglink, Filters.command)
+        dispatcher.add_handler(handler)
         handler = CommandHandler('nextmeeting', self.handle_nextmeeting, Filters.command)
-        dispatcher.add_handler(handler)        
+        dispatcher.add_handler(handler)
+        handler = CommandHandler('setmeetinglink', self.handle_setmeetinglink, Filters.command)
+        dispatcher.add_handler(handler)
         self.cmd_setnextmeeting.setup(dispatcher)
 
 def setup_handler(dispatcher):
