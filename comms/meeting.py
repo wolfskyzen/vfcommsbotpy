@@ -157,8 +157,18 @@ class MeetingManager:
     def get_next_meeting(self):
         if self.date is None or self.location is None:
             return "The next meeting date is not set."
+        now = datetime.datetime.now()
         datestr = self.date.strftime("%A, %B %d, %Y, %I:%M %p")
-        return "The next meeting is {0} at {1}.".format(datestr, self.location)
+        resultstr = "The next meeting is {0} at {1}.".format(datestr, self.location)
+        delta = self.date - now
+        if delta.days > 0:
+            resultstr += " That is in {0} days.".format(delta.days)
+        else:
+            minutes = int(delta.seconds / 60)
+            hours =  int(minutes / 60)
+            minutes = minutes % 60
+            resultstr += " That is in {0} hours and {1} minutes.".format(hours, minutes)
+        return resultstr
     
     def load(self):
         if os.path.isfile(self.FILE_NAME) == False:
