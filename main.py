@@ -1,5 +1,6 @@
 #!/usr/bin/python
 from comms.core import Core
+import sys
 
 def stop():
     core.stop()

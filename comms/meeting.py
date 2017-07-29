@@ -168,7 +168,10 @@ class MeetingManager:
             root = json.load(file)
             file.close()
         if root is not None:
-            self.date = parser.parse(root["date"])
+            if root["date"] is not None:
+                self.date = parser.parse(root["date"])
+            else:
+                self.date = None
             self.link = root["link"]
             self.location = root["location"]
         
