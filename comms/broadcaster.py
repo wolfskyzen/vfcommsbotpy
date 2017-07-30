@@ -136,7 +136,7 @@ class Broadcaster:
             return
         group_id = update.message.chat.id
         if not self.groups or group_id not in self.groups:
-            self.groups[group_id] = Group.from_chat(chat, True)
+            self.groups[group_id] = Group.from_chat(update.message.chat, True)
             self.save()
         else:
             print("Group '{0}' already added".format(update.message.chat.title))
