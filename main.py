@@ -8,6 +8,7 @@ def stop():
 def get_token():
     tokenfile = open("var/TOKEN")
     token = tokenfile.readline()
+    token = token.strip()
     return token
 
 if __name__ == "__main__":
