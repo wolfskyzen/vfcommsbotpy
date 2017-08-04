@@ -98,6 +98,18 @@ class MeetingManager:
     
     def __init__(self):
         self.cmd_setnextmeeting = _SetNextMeetingCommand(self)
+        
+    def handle_broadcastmeeting(self, bot, update):
+        if update.message.chat.type != Chat.PRIVATE:
+            return
+        if not users.is_admin(update.message.from_user.id):
+            return
+        if self.date is None or self.location is None:
+            message = "Cannot broadcast the next meeting because there is no meeting info setup."
+            bot.sendMessage(update.message.chat.id, message)
+            return
+        message = self.get_next_meeting()
+        broadcaster.broadcast(bot, message)
     
     def handle_clearmeeting(self, bot, update):
         if update.message.chat.type != Chat.PRIVATE:
@@ -196,6 +208,8 @@ class MeetingManager:
     
     def setup(self, dispatcher):
         self.load()
+        handler = CommandHandler('broadcastmeeting', self.handle_broadcastmeeting, Filters.command)
+        dispatcher.add_handler(handler)
         handler = CommandHandler('clearmeeting', self.handle_clearmeeting, Filters.command)
         dispatcher.add_handler(handler)
         handler = CommandHandler('clearmeetinglink', self.handle_clearmeetinglink, Filters.command)

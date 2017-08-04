@@ -19,6 +19,7 @@ Admin commands. If you get this message, you can use these commands. Must be sen
 /addgroup - Adds a group to the internal list for broadcast targets. Send this as a group message and use /listgroups to see the results in DM.
 /adminadd - Adds a user to the admin list. Must include an @ mention of the user to add. Target user must also message the bot with /noticeme to get added to the internal userlist.
 /adminremove - Adds a user to the admin list. Must include an @ mention of the user to add.
+/broadcastmeeting - Broadcasts the next meeting info to all groups, if there is a meeting set.
 /clearmeeting - Clears the current meeting date and time.
 /clearmeetinglink - Clears the current remote meeting link.
 /grouplist - List all the known groups setup with /addgroup.
