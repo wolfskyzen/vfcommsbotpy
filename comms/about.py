@@ -22,7 +22,7 @@ def handle_about(bot, update):
 def setup():
     try:
         global git_version
-        git_version = subprocess.check_output("git log --pretty=format:""%h"" -1")
+        git_version = subprocess.check_output("git log --pretty=format:""%h"" -1", shell=True)
         git_version = git_version.decode("utf-8")
     except:
         print("Unable to get current local git revision")
