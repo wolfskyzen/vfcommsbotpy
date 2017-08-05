@@ -6,13 +6,13 @@ import os
 import subprocess
 import sys
 
-git_version = None
+revision = None
 
 def handle_about(bot, update):
     message = "VancouFur Staff Communications Bot" + os.linesep
-    global git_version
-    if git_version is not None:
-        message = message + "Version 2.0 ({0})".format(git_version) + os.linesep
+    global revision
+    if revision is not None:
+        message = message + "Version 2.0 ({0})".format(revision) + os.linesep
     else:
         message = message + "Version 2.0" + os.linesep
     message = message + "Created by Zen using the Python Telegram Bot API." + os.linesep
@@ -21,9 +21,10 @@ def handle_about(bot, update):
     
 def setup():
     try:
-        global git_version
-        git_version = subprocess.check_output("git log --pretty=format:""%h"" -1", shell=True)
-        git_version = git_version.decode("utf-8")
+        global revision
+        revisionfile = open("var/REVISION")
+        revision = revisionfile.readline()
+        revision = revision.strip()        
     except:
         print("Unable to get current local git revision")
         print(sys.exc_info())
