@@ -138,7 +138,14 @@ class UserManager:
             self.users[user.id] = user
             self.save()
         else:
-            message = "Senpai already noticed you."
+            user = self.users[user_id]
+            curr_username = update.message.from_user.username
+            if user.username is not curr_username:
+                message = "Senpai noticed you again"
+                user.username = curr_username
+                self.save()
+            else:
+                message = "Senpai already noticed you."
         bot.sendMessage(update.message.from_user.id, message)
         
     def handle_userlist(self, bot, update):
