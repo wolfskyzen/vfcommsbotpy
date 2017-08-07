@@ -12,6 +12,6 @@ How do you get a bot token? Check here https://core.telegram.org/bots
 Using the [python-telegram-bot](https://python-telegram-bot.org/) for this bot, licensed under LGPLv3.
 
 # Requirements
-* python 3.6.1
-* python-dateutil 2.6.0
-* python-telegram-bot 5.3.0
+* [python 3.5](https://www.python.org/)
+* [python-dateutil](https://pypi.python.org/pypi/python-dateutil/)
+* [python-telegram-bot](https://python-telegram-bot.org/)
