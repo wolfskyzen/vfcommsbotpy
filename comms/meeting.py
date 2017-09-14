@@ -173,8 +173,10 @@ class MeetingManager:
         datestr = self.date.strftime("%A, %B %d, %Y, %I:%M %p")
         resultstr = "The next meeting is {0} at {1}.".format(datestr, self.location)
         delta = self.date - now
-        if delta.days > 0:
+        if delta.days >= 0:
             resultstr += " That is in {0} days.".format(delta.days)
+        if delta.days < 0:
+            resultstr += " The next meeting date is in the past."
         else:
             minutes = int(delta.seconds / 60)
             hours =  int(minutes / 60)
