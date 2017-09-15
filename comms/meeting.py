@@ -176,7 +176,10 @@ class MeetingManager:
         if delta.days >= 0:
             resultstr += " That is in {0} days.".format(delta.days)
         if delta.days < 0:
-            resultstr += " The next meeting date is in the past."
+            resultstr += " The next meeting date is not set."
+            self.date = None
+            self.location = ""
+            self.save()
         else:
             minutes = int(delta.seconds / 60)
             hours =  int(minutes / 60)
