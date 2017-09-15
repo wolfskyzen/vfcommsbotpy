@@ -57,7 +57,7 @@ class _SetNextMeetingCommand:
             return ConversationHandler.END
         self.manager.location = update.message.text
         message = self.manager.get_next_meeting()
-        message = message + "\nIs this correct?"
+        #message = message + "\nIs this correct?"
         bot.sendMessage(update.message.from_user.id, message)
         return _SetNextMeetingCommand.CONFIRM
         
@@ -171,9 +171,10 @@ class MeetingManager:
             return "The next meeting date is not set."
         now = datetime.datetime.now()
         datestr = self.date.strftime("%A, %B %d, %Y, %I:%M %p")
-        resultstr = "The next meeting is {0} at {1}.".format(datestr, self.location)
+        resultstr = ""
         delta = self.date - now
         if delta.days >= 0:
+            resultstr = "The next meeting is {0} at {1}.".format(datestr, self.location)
             resultstr += " That is in {0} days.".format(delta.days)
         if delta.days < 0:
             resultstr += " The next meeting date is not set."
@@ -181,6 +182,7 @@ class MeetingManager:
             self.location = ""
             self.save()
         else:
+            resultstr = "The next meeting is {0} at {1}.".format(datestr, self.location)
             minutes = int(delta.seconds / 60)
             hours =  int(minutes / 60)
             minutes = minutes % 60
