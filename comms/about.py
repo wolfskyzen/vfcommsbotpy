@@ -12,11 +12,10 @@ def handle_about(bot, update):
     message = "VancouFur Staff Communications Bot" + os.linesep
     global revision
     if revision is not None:
-        message = message + "Version 2.1 ({0})".format(revision) + os.linesep
+        message = message + "Version 2.0 ({0})".format(revision) + os.linesep
     else:
-        message = message + "Version 2.1" + os.linesep
+        message = message + "Version 2.0" + os.linesep
     message = message + "Created by Zen using the Python Telegram Bot API." + os.linesep
-    message = message + "Bugfixes by Maxwolf as seen on TV!" + os.linesep
     message = message + "https://github.com/wolfskyzen/vfcommsbotpy"
     bot.sendMessage(chat_id=update.message.chat_id, text=message, reply_to_message_id=update.message.message_id)
     
