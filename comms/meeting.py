@@ -57,7 +57,6 @@ class _SetNextMeetingCommand:
             return ConversationHandler.END
         self.manager.location = update.message.text
         message = self.manager.get_next_meeting()
-        #message = message + "\nIs this correct?"
         bot.sendMessage(update.message.from_user.id, message)
         return _SetNextMeetingCommand.CONFIRM
         
