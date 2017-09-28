@@ -171,8 +171,6 @@ class MeetingManager:
         resultstr = ""
         delta = self.date - now
         if delta.days < 0:
-            self.reset()
-            self.save()            
             resultstr = " The next meeting date is not set."        
         elif delta.days > 0:
             resultstr = "The next meeting is {0} at {1}.".format(datestr, self.location)
