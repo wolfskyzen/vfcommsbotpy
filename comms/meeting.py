@@ -172,14 +172,11 @@ class MeetingManager:
         datestr = self.date.strftime("%A, %B %d, %Y, %I:%M %p")
         resultstr = ""
         delta = self.date - now
-        if delta.days >= 0:
+        if delta.days > 0:
             resultstr = "The next meeting is {0} at {1}.".format(datestr, self.location)
             resultstr += " That is in {0} days.".format(delta.days)
-        if delta.days < 0:
-            resultstr += " The next meeting date is not set."
-            self.date = None
-            self.location = ""
-            self.save()
+        elif delta.days <= 0:
+            resultstr = " The next meeting date is not set."
         else:
             resultstr = "The next meeting is {0} at {1}.".format(datestr, self.location)
             minutes = int(delta.seconds / 60)
