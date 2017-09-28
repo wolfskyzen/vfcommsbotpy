@@ -115,9 +115,7 @@ class MeetingManager:
             return
         if not users.is_admin(update.message.from_user.id):
             return
-        self.date = None
-        self.link = ""
-        self.location = ""
+        self.reset()
         self.save()
         message = "Next meeting information has been cleared."
         bot.sendMessage(update.message.chat.id, message)
@@ -172,11 +170,13 @@ class MeetingManager:
         datestr = self.date.strftime("%A, %B %d, %Y, %I:%M %p")
         resultstr = ""
         delta = self.date - now
-        if delta.days > 0:
+        if delta.days < 0:
+            self.reset()
+            self.save()            
+            resultstr = " The next meeting date is not set."        
+        elif delta.days > 0:
             resultstr = "The next meeting is {0} at {1}.".format(datestr, self.location)
             resultstr += " That is in {0} days.".format(delta.days)
-        elif delta.days <= 0:
-            resultstr = " The next meeting date is not set."
         else:
             resultstr = "The next meeting is {0} at {1}.".format(datestr, self.location)
             minutes = int(delta.seconds / 60)
@@ -199,6 +199,11 @@ class MeetingManager:
                 self.date = None
             self.link = root["link"]
             self.location = root["location"]
+            
+    def reset(self):
+        self.date = None
+        self.link = ""
+        self.location = ""
         
     def save(self):
         json_date = None
