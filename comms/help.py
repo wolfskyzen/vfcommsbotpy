@@ -22,6 +22,8 @@ Admin commands. If you get this message, you can use these commands. Must be sen
 /broadcastmeeting - Broadcasts the next meeting info to all groups, if there is a meeting set.
 /clearmeeting - Clears the current meeting date and time.
 /clearmeetinglink - Clears the current remote meeting link.
+/disablebroadcast - Disables broadcasting of messages to a group. (Must be send in the group)
+/enablebroadcast - Enables broadcasting of messages to a group. (Must be send in the group)
 /grouplist - List all the known groups setup with /addgroup.
 /setmeetinglink - Set a valid weblink for remote meeting connection. Will broadcast to all groups when changed.
 /setnextmeeting - Set the date, time and location of the next meeting. Will broadcast to all groups when changed.

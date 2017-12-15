@@ -7,6 +7,7 @@ from telegram.ext import CommandHandler
 from telegram.ext import ConversationHandler
 from telegram.ext import Filters
 from telegram.ext import MessageHandler
+from comms import users
 
 class Group:
     allowed = False
@@ -138,7 +139,35 @@ class Broadcaster:
                 print("Group '{0}' updated".format(group.title))
             else:
                 print("Group '{0}' already added".format(group.title))
-            
+    
+    def handle_disablebroadcast(self, bot, update):
+        if update.message.chat.type == Chat.PRIVATE:
+            return
+        if not users.is_admin(update.message.from_user.id):
+            return
+        group_id = update.message.chat.id
+        if not self.groups or group_id not in self.groups:
+            return
+        group = self.groups[group_id]
+        group.allowed = False
+        self.save()
+        message = "Broadcasting disabled for this group."
+        bot.sendMessage(chat_id=update.message.chat.id, reply_to_message_id=update.message.message_id, text=message)
+    
+    def handle_enablebroadcast(self, bot, update):
+        if update.message.chat.type == Chat.PRIVATE:
+            return
+        if not users.is_admin(update.message.from_user.id):
+            return
+        group_id = update.message.chat.id
+        if not self.groups or group_id not in self.groups:
+            return
+        group = self.groups[group_id]
+        group.allowed = True
+        self.save()
+        message = "Broadcasting enabled for this group."
+        bot.sendMessage(chat_id=update.message.chat.id, reply_to_message_id=update.message.message_id, text=message)
+    
     def handle_grouplist(self, bot, update):
         if update.message.chat.type != Chat.PRIVATE:
             return
@@ -150,7 +179,7 @@ class Broadcaster:
             for k, v in self.groups.items():
                 message += "\n{0} ({1})".format(v.title, str(v.allowed))
         if not message == None:
-            bot.sendMessage(update.message.from_user.id, message)    
+            bot.sendMessage(update.message.from_user.id, message)
 
     def load(self):
         if os.path.isfile(self.FILE_NAME) == False:
@@ -175,8 +204,12 @@ class Broadcaster:
         self.load()
         handler = CommandHandler('addgroup', self.handle_addgroup, Filters.command)
         dispatcher.add_handler(handler);
-        handler = CommandHandler('grouplist', self.handle_grouplist, Filters.command)
+        handler = CommandHandler('disablebroadcast', self.handle_disablebroadcast, Filters.command)
+        dispatcher.add_handler(handler);
+        handler = CommandHandler('enablebroadcast', self.handle_enablebroadcast, Filters.command)
         dispatcher.add_handler(handler);        
+        handler = CommandHandler('grouplist', self.handle_grouplist, Filters.command)
+        dispatcher.add_handler(handler);
         self.cmd_broadcast.setup(dispatcher)
 
 global instance
