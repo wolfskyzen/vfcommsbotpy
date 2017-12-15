@@ -91,15 +91,6 @@ class _BroadcastCommand:
         )
         dispatcher.add_handler(handler)
 
-"""
-TODO: Build these two classes to use the inline commands to enable/disable groups from the broadcast list
-TODO: Abstract this into a GroupManager that the broadcast command can communicate with
-
-class _DisableBroadcastCommand:
-
-class _EnableBroadcastCommand:
-"""
-
 class Broadcaster:
     FILE_NAME = 'var/GROUPS'
 
@@ -139,7 +130,14 @@ class Broadcaster:
             self.groups[group_id] = Group.from_chat(update.message.chat, True)
             self.save()
         else:
-            print("Group '{0}' already added".format(update.message.chat.title))
+            group = self.groups[group_id]
+            curr_title = update.message.chat.title
+            if group.title != curr_title:
+                group.title = curr_title
+                self.save()
+                print("Group '{0}' updated".format(group.title))
+            else:
+                print("Group '{0}' already added".format(group.title))
             
     def handle_grouplist(self, bot, update):
         if update.message.chat.type != Chat.PRIVATE:

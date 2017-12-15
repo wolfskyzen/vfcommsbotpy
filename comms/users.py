@@ -140,7 +140,7 @@ class UserManager:
         else:
             user = self.users[user_id]
             curr_username = update.message.from_user.username
-            if user.username is not curr_username:
+            if user.username != curr_username:
                 message = "Senpai noticed you again"
                 user.username = curr_username
                 self.save()
