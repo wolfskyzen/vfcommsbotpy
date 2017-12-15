@@ -90,4 +90,4 @@ ENV/
 .ropeproject
 
 # Wing IDE project settings
-.wpr
+*.wpr
