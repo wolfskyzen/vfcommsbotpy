@@ -8,7 +8,7 @@ class Core:
     updater = None
     
     def handle_error(bot, update, error):
-        print("Update {0} encountered error %s".format(update, error))
+        print("Update {0} encountered error {1}".format(update, error))
     
     def run(self):
         if self.updater != None:
