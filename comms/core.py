@@ -22,7 +22,7 @@ class Core:
             print("Failed to setup Telegram Updater")
             return
         self.updater.dispatcher.add_error_handler(Core.handle_error)
-        handlers.setup(self.updater.dispatcher)
+        handlers.setup(self.updater)
         self.verify()
     
     def stop(self):

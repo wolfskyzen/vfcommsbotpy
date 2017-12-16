@@ -1,10 +1,13 @@
 #!/usr/bin/python
 import json
 import datetime
+import dateutil
 import os
 import sys
+import threading
 from comms import broadcaster
 from comms import users
+from dateutil import relativedelta
 from dateutil import parser
 from telegram import Chat
 from telegram import MessageEntity
@@ -31,6 +34,7 @@ class _SetNextMeetingCommand:
         if update.message.chat.type != Chat.PRIVATE:            
             return ConversationHandler.END
         self.manager.save()
+        self.manager.setup_reminder()
         message = "Next meeting has been set by @{0}".format(update.message.from_user.username)
         message += "\n\n"
         message += self.manager.get_next_meeting()
@@ -57,6 +61,8 @@ class _SetNextMeetingCommand:
             return ConversationHandler.END
         self.manager.location = update.message.text
         message = self.manager.get_next_meeting()
+        message += "\n\n"
+        message += "Is this correct? Please respond with 'yes' if this is, otherwise, send /cancel to start over."
         bot.sendMessage(update.message.from_user.id, message)
         return _SetNextMeetingCommand.CONFIRM
         
@@ -91,12 +97,29 @@ class MeetingManager:
     
     cmd_setnextmeeting = None
     
+    bot = None
     date = None
     link = ""
     location = ""
+    timer = None
     
     def __init__(self):
         self.cmd_setnextmeeting = _SetNextMeetingCommand(self)
+        
+    def check_reminder(self):
+        self.timer = None
+        if self.date is None:
+            return
+        now = datetime.date.today()
+        deltatime = self.date.date() - now
+        print("Delta to next meeting:", deltatime)
+        # TODO: Timer spacings are harcoded!
+        # Auto-Broadcast once a week for the 2 weeks prior, then daily for the last 5 days
+        if deltatime.days > 0 and (deltatime.days == 14 or deltatime.days == 7 or deltatime.days <= 5):
+            if self.bot:
+                message = self.get_next_meeting()
+                broadcaster.broadcast(self.bot, message)
+        self.setup_reminder()    
         
     def handle_broadcastmeeting(self, bot, update):
         if update.message.chat.type != Chat.PRIVATE:
@@ -115,6 +138,9 @@ class MeetingManager:
             return
         if not users.is_admin(update.message.from_user.id):
             return
+        if self.timer:
+            self.timer.cancel()
+        self.timer = None
         self.reset()
         self.save()
         message = "Next meeting information has been cleared."
@@ -212,8 +238,9 @@ class MeetingManager:
             json.dump(root, file, indent=4)
             file.close()
     
-    def setup(self, dispatcher):
+    def setup(self, dispatcher, bot):
         self.load()
+        self.bot = bot
         handler = CommandHandler('broadcastmeeting', self.handle_broadcastmeeting, Filters.command)
         dispatcher.add_handler(handler)
         handler = CommandHandler('clearmeeting', self.handle_clearmeeting, Filters.command)
@@ -227,8 +254,33 @@ class MeetingManager:
         handler = CommandHandler('setmeetinglink', self.handle_setmeetinglink, Filters.command)
         dispatcher.add_handler(handler)
         self.cmd_setnextmeeting.setup(dispatcher)
+        self.setup_reminder()
+        
+    def setup_reminder(self):
+        # TODO: This is hardcoded to 10:30 AM local time
+        TARGET_HOUR = 10
+        TARGET_MINUTE = 30
+        if self.timer is not None:
+            self.timer.cancel()
+            self.timer = None
+        if self.date is None:
+            return
+        now = datetime.datetime.now()
+        target = None
+        if now.hour < TARGET_HOUR or (now.hour == TARGET_HOUR and now.minute < TARGET_MINUTE):
+            target = datetime.datetime(now.year, now.month, now.day, TARGET_HOUR, TARGET_MINUTE)
+        else:
+            target = now + relativedelta.relativedelta(days=+1, hour=TARGET_HOUR, minute=TARGET_MINUTE)
+        print("Next automated meeting reminder:", target.ctime())
+        deltatime = target - now
+        try:
+            self.timer = threading.Timer(deltatime.total_seconds(), self.check_reminder)
+            self.timer.start()
+        except:
+            print("Error creating timer thread:", sys.exc_info()[0])
+            self.timer = None
 
-def setup_handler(dispatcher):
+def setup_handler(dispatcher, bot):
     print("Setup meeting commands");
     instance = MeetingManager()
-    instance.setup(dispatcher)
+    instance.setup(dispatcher, bot)
